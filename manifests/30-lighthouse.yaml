@@ -17,7 +17,6 @@ spec:
         args:
         - bn
         - --network=hoodi
-        - --enr-address=13.124.253.41
         - --datadir=/data
         - --execution-endpoint=http://geth-engine:8551
         - --execution-jwt=/jwt/jwt.hex
