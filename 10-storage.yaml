@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata: {name: hoodi}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: {name: geth-data}
+spec:
+  capacity: {storage: 200Gi}
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath: {path: /data/geth, type: Directory}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: geth-data, namespace: hoodi}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  volumeName: geth-data
+  resources: {requests: {storage: 200Gi}}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: {name: lighthouse-data}
+spec:
+  capacity: {storage: 30Gi}
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath: {path: /data/lighthouse, type: Directory}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: lighthouse-data, namespace: hoodi}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  volumeName: lighthouse-data
+  resources: {requests: {storage: 30Gi}}

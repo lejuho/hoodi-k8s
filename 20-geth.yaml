@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: geth, namespace: hoodi}
+spec:
+  serviceName: geth
+  replicas: 1
+  selector: {matchLabels: {app: geth}}
+  template:
+    metadata: {labels: {app: geth}}
+    spec:
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 300
+      containers:
+      - name: geth
+        image: ethereum/client-go:stable
+        args:
+        - --hoodi
+        - --datadir=/data
+        - --syncmode=snap
+        - --maxpeers=25
+        - --nat=extip:13.124.253.41
+        - --http
+        - --http.addr=0.0.0.0
+        - --http.api=eth,net,web3
+        - --http.vhosts=*
+        - --authrpc.addr=0.0.0.0
+        - --authrpc.port=8551
+        - --authrpc.vhosts=*
+        - --authrpc.jwtsecret=/jwt/jwt.hex
+        - --metrics
+        - --metrics.addr=0.0.0.0
+        ports:
+        - {name: p2p-tcp, containerPort: 30303, hostPort: 30303, protocol: TCP}
+        - {name: p2p-udp, containerPort: 30303, hostPort: 30303, protocol: UDP}
+        - {name: rpc, containerPort: 8545}
+        - {name: engine, containerPort: 8551}
+        - {name: metrics, containerPort: 6060}
+        resources:
+          requests: {cpu: "1", memory: 6Gi}
+          limits: {memory: 10Gi}
+        volumeMounts:
+        - {name: data, mountPath: /data}
+        - {name: jwt, mountPath: /jwt, readOnly: true}
+      volumes:
+      - name: data
+        persistentVolumeClaim: {claimName: geth-data}
+      - name: jwt
+        secret: {secretName: jwt}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: geth, namespace: hoodi}
+spec:
+  selector: {app: geth}
+  ports:
+  - {name: rpc, port: 8545}
+  - {name: engine, port: 8551}
