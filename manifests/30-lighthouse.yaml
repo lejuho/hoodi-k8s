@@ -18,7 +18,7 @@ spec:
         - bn
         - --network=hoodi
         - --datadir=/data
-        - --execution-endpoint=http://geth:8551
+        - --execution-endpoint=http://geth-engine:8551
         - --execution-jwt=/jwt/jwt.hex
         - --checkpoint-sync-url=https://checkpoint-sync.hoodi.ethpandaops.io
         - --http
