@@ -12,7 +12,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: geth
-        image: ethereum/client-go:stable
+        image: ethereum/client-go:v1.17.7
         args:
         - --hoodi
         - --datadir=/data
