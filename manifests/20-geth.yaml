@@ -38,20 +38,29 @@ spec:
         resources:
           requests: {cpu: "1", memory: 6Gi}
           limits: {memory: 10Gi}
-        readinessProbe:
-          exec:
-            command:
-            - sh
-            - -c
-            - |
-              [ "$(geth attach --exec '!eth.syncing && net.peerCount >= 3 && (Math.floor(Date.now()/1000) - eth.getBlock("latest").timestamp) < 60' /data/geth.ipc)" = "true" ]
-          initialDelaySeconds: 30
-          periodSeconds: 15
-          timeoutSeconds: 10
-          failureThreshold: 3
         volumeMounts:
         - {name: data, mountPath: /data}
         - {name: jwt, mountPath: /jwt, readOnly: true}
+      - name: healthcheck
+        image: healthcheck:v1
+        imagePullPolicy: IfNotPresent
+        env:
+        - {name: RPC_URL, value: "http://localhost:8545"}
+        - {name: REF_URL, value: "https://ethereum-hoodi-rpc.publicnode.com"}
+        ports:
+        - {name: health, containerPort: 8081}
+        readinessProbe:
+          httpGet: {path: /ready, port: health}
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet: {path: /healthz, port: health}
+          periodSeconds: 20
+        resources:
+          requests: {cpu: 10m, memory: 16Mi}
+          limits: {memory: 64Mi}
       volumes:
       - name: data
         persistentVolumeClaim: {claimName: geth-data}
